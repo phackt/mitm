@@ -1,4 +1,4 @@
-MITM ATTACK WITH HTTP PROXYING ([MITMPROXY](http://docs.mitmproxy.org/en/stable/) v1.0)
+MITM ATTACK WITH HTTP PROXYING (using [MITMPROXY](http://docs.mitmproxy.org/en/stable/) v1.0)
 ----------
   
 You can run  **mitm.sh**:  
