@@ -20,6 +20,15 @@ if [ $# -ne 2 ]; then
 	help
 fi
 
+echo "Setting configuration..."
+#####################################
+# routing configuration
+#####################################
+sysctl -w net.ipv4.ip_forward=1 &>/dev/null
+
+#avoid icmp redirect
+echo 0 | tee /proc/sys/net/ipv4/conf/*/send_redirects &>/dev/null
+
 #####################################
 # starting arp spoofing
 #####################################

@@ -121,22 +121,14 @@ if [ ${HTTP_INTERCEPTION} -eq 1 ] || [ ${HTTPS_INTERCEPTION} -eq 1 ]; then
 	iptables --delete-chain
 	iptables --table nat --delete-chain
 
-	echo "Setting configuration..."
-	#####################################
-	# routing configuration
-	#####################################
-	sysctl -w net.ipv4.ip_forward=1 &>/dev/null
-
-	#avoid icmp redirect
-	echo 0 | tee /proc/sys/net/ipv4/conf/*/send_redirects &>/dev/null
-
-        #iptables redirect from 80 to 8080 on localhost
-        if [ ${HTTP_INTERCEPTION} -eq 1 ]; then
+	
+    #iptables redirect from 80 to 8080 on localhost
+    if [ ${HTTP_INTERCEPTION} -eq 1 ]; then
 		iptables -t nat -A PREROUTING -i ${INTERFACE} -p tcp --dport 80 -j REDIRECT --to-port 8080
 	fi
 
  	#iptables redirect from 443 to 8080 on localhost
-        if [ ${HTTPS_INTERCEPTION} -eq 1 ]; then
+    if [ ${HTTPS_INTERCEPTION} -eq 1 ]; then
 		iptables -t nat -A PREROUTING -i ${INTERFACE} -p tcp --dport 443 -j REDIRECT --to-port 8080
 	fi
 fi
