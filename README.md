@@ -48,7 +48,7 @@ ___
 sysctl -w net.ipv4.ip_forward=1
 ```
 
- - avoid to send useless ICMP redirect messages
+ - avoid to send undesirable ICMP redirect messages
 ```bash
 echo 0 | sudo tee /proc/sys/net/ipv4/conf/*/send_redirects
 ```
