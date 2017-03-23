@@ -3,7 +3,7 @@ MITM ATTACK WITH HTTP PROXYING (using [MITMPROXY](http://docs.mitmproxy.org/en/s
   
 You can run  **mitm.sh**:  
 ```bash
-Usage: ./mitm.sh [-g] [-n] [-s] [-x] [-j] <js payload url> [-d] [-i] <interface> ip_target1 ip_target2
+Usage: ./mitm.sh [-g] [-n] [-s] [-x] [-j] <js payload url> [-d] [-i] <interface> gateway_ip target_ip
        [-g] interactive mode for mitmproxy
        [-n] capture HTTP traffic
        [-s] capture HTTPS traffic
