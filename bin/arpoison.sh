@@ -4,7 +4,7 @@
 # Displays help
 #####################################
 function help(){
-	echo $"Usage: $0 ip_target1 ip_target2"
+    echo $"Usage: $0 ip_target1 ip_target2"
         exit 1
 }
 
@@ -12,12 +12,12 @@ function help(){
 # Checking is root
 #####################################
 if [ $(id -u) -ne 0 ]; then
-	echo "You'd better be root! Exiting..."
-	exit
+    echo "You'd better be root! Exiting..."
+    exit
 fi
 
 if [ $# -ne 2 ]; then
-	help
+    help
 fi
 
 #####################################
