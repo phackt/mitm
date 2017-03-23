@@ -20,10 +20,11 @@ if [ $# -ne 2 ]; then
 	help
 fi
 
-echo "Setting configuration..."
 #####################################
 # routing configuration
 #####################################
+echo "Setting configuration..."
+
 sysctl -w net.ipv4.ip_forward=1 &>/dev/null
 
 #avoid icmp redirect

