@@ -4,7 +4,7 @@
 # Displays help
 #####################################
 function help(){
-    echo $"Usage: $0 ip_target1 ip_target2"
+    echo "Usage: $0 ip_target1 ip_target2"
         exit 1
 }
 
