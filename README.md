@@ -96,5 +96,3 @@ urlsnarf > ./urlsnarf.txt &
 If you injected a Beef hook thanks to the -j option, also check the browser hooked in your Beef panel.**  
   
 **Don't hesitate to contribute to all of these modules.**
-
-
