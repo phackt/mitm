@@ -15,7 +15,7 @@ export PATH=$(pwd)/bin:${PATH}
 #####################################
 
 function help(){
-    echo "Usage: $0 [-g] [-n] [-s] [-x] [-j] <js payload url> [-d] [-i] <interface> gateway_ip target_ip"
+    echo "Usage: $0 [-g] [-n] [-s] [-x] [-j <js payload url>] [-d] [-i <interface>] gateway_ip target_ip"
     echo "       [-g] interactive mode for mitmproxy"
     echo "       [-n] capture HTTP traffic"
     echo "       [-s] capture HTTPS traffic"
