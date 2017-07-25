@@ -183,7 +183,6 @@ if [ ${INJECT_JS} -eq 1 ]; then
 fi
 
 if [ ${INTERACTIVE_MODE} -eq 1 ]; then
-    echo xterm -maximized -T "mitmproxy" -hold -e ${MITMPROXY_PATH}/mitmproxy -T --anticache --host --anticomp --noapp --eventlog --script "${SCRIPT_PATH}/script/io_write_dumpfile.py ${SCRIPT_PATH}/log/requests.log" ${SSLSTRIP_SCRIPT} ${INJECT_JS:+ ${INJECTJS_SCRIPT[0]} "${INJECTJS_SCRIPT[1]}"} &
     xterm -maximized -T "mitmproxy" -hold -e ${MITMPROXY_PATH}/mitmproxy -T --anticache --host --anticomp --noapp --eventlog --script "${SCRIPT_PATH}/script/io_write_dumpfile.py ${SCRIPT_PATH}/log/requests.log" ${SSLSTRIP_SCRIPT} ${INJECT_JS:+ ${INJECTJS_SCRIPT[0]} "${INJECTJS_SCRIPT[1]}"} &
 else
     echo "Running mitmdump..."
